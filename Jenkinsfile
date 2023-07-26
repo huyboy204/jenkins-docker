@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
                 withSonarQubeEnv('sonarqube-server') {
-                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-dev -Dsonar.projectName='Spring project dev'"
+                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-main -Dsonar.projectName='Spring project main'"
                 }
             }
         }
