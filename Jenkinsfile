@@ -1,17 +1,9 @@
 pipeline {
     agent any
     tools {
-        
+        jdk 'Java17'
     }
     stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    git credentialsId: 'gitlab-credential', url: 'http://192.168.56.103:8929/spring-group/spring-project.git', branch: 'develop'
-                }
-            }
-        }
-        
         stage('Unit Test with JUnit') {
             steps {
                 sh './mvnw test'
