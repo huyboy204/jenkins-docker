@@ -6,9 +6,15 @@ pipeline {
     }
 
     environment {
+        NEXUS_USER = "jenkins-user"
+        NEXUS_PASS = "20042001Huy@" 
         NEXUS_URL = "192.168.56.103:8081"
         NEXUS_REPOSITORY = "java-repo"
         NEXUS_CREDENTIAL_ID = "nexus-credential"
+        NEXUS_PRO_REPO = "java-repo"
+        NEXUS_GROUP = "Product"
+        NEXUS_ARTIFACT_ID = "Spring-RELEASE"
+        ARTIFACT_VERS = "1.${env.BUILD_ID}-${new Date().format('yyMMdd-HHmm')}"
     }
 
     stages {
@@ -69,17 +75,26 @@ pipeline {
                     nexusVersion: 'nexus3',
                     protocol: 'http',
                     nexusUrl: "${NEXUS_URL}",
-                    groupId: 'Product',
-                    version: "1.${env.BUILD_ID}-${new Date().format('yyMMdd-HHmm')}",
-                    repository: 'java-repo',
+                    groupId: "${NEXUS_GROUP}",
+                    version: "${ARTIFACT_VERS}",
+                    repository: "${NEXUS_PRO_REPO}",
                     credentialsId: "${NEXUS_CREDENTIAL_ID}",
                     artifacts: [
-                        [artifactId: 'Spring-RELEASE',
+                        [artifactId: "${NEXUS_ARTIFACT_ID}",
                         classifier: '',
                         file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
                         type: 'jar']
                     ]
                 )
+            }
+        }
+
+        stage('Pull artifact') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh "curl -v -u ${NEXUS_USER}}:${NEXUS_PASS} -o ~/tmp/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar http://${NEXUS_URL}/repository/${NEXUS_PRO_REPO}/${NEXUS_GROUP}/${NEXUS_ARTIFACT_ID}/${ARTIFACT_VERS}/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar"
             }
         }
     }
