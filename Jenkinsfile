@@ -94,12 +94,9 @@ pipeline {
             }
             steps {
                 sshagent(['sshagent-acc']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                    sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
                 }
             }
-            // steps {
-            //     sh 'curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
-            // }
         }
 
         stage('Deploy artifact') {
@@ -108,7 +105,10 @@ pipeline {
             }
             steps {
                 sshagent(['sshagent-acc']) {
-                    sh 'ssh root@192.168.56.120 nohup java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                    sh '''
+                        ssh root@192.168.56.120
+                        nohup java -jar /tmp/web-Spring.jar
+                    '''
                 }
             }
             
