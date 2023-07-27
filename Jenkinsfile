@@ -105,11 +105,7 @@ pipeline {
             }
             steps {
                 sshagent(['sshagent-acc']) {
-                    //sh 'ssh root@192.168.56.120 java -jar /tmp/web-Spring.jar'
-                    script {
-                        ssh -l root 192.168.56.120
-                        nohup java -jar /tmp/web-Spring.jar
-                    }
+                    sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
                 }
             }
             
