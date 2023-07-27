@@ -96,7 +96,7 @@ pipeline {
             }
             steps {
                 script {
-                    sshagent(credentials: ['ssh-credentials-id']) {
+                    sshagent(credentials: ['sshagent-acc']) {
                         sh '''
                             curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
                         '''
@@ -114,7 +114,7 @@ pipeline {
             }
             steps {
                 script {
-                    sshagent(credentials: ['ssh-credentials-id']) {
+                    sshagent(credentials: ['sshagent-acc']) {
                         sh '''
                             java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
                         '''
