@@ -118,8 +118,8 @@ pipeline {
             steps {
                 script {
                     sleep(time: 30, unit: 'SECONDS')
-                    def response = httpRequest "http://192.168.56.120:8080"
-                    println("Status: ${response.status}")
+                    def web_response = httpRequest "http://192.168.56.120:8080"
+                    println("Status: ${web_response.status}")
                 }
             }
         }
