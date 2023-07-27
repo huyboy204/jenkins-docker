@@ -108,7 +108,7 @@ pipeline {
             }
             steps {
                 sshagent(['sshagent-acc']) {
-                    sh 'ssh root@192.168.56.120 java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                    sh 'ssh root@192.168.56.120 nohup java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
                 }
             }
             
