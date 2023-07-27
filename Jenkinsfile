@@ -107,8 +107,8 @@ pipeline {
                 sshagent(['sshagent-acc']) {
                     //sh 'ssh root@192.168.56.120 java -jar /tmp/web-Spring.jar'
                     script {
-                        ssh root@192.168.56.120
-                        java -jar /tmp/web-Spring.jar
+                        ssh -o StrictHostKeyChecking=no -l root 192.168.56.120
+                        nohup java -jar /tmp/web-Spring.jar
                     }
                 }
             }
