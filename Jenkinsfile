@@ -6,8 +6,6 @@ pipeline {
     }
 
     environment {
-        NEXUS_USER = "jenkins-user"
-        NEXUS_PASS = "20042001Huy@"
         NEXUS_ACC = credentials('nexus-credential')
         NEXUS_URL = "192.168.56.103:8081"
         NEXUS_REPOSITORY = "java-repo"
@@ -95,12 +93,17 @@ pipeline {
                 branch 'main'
             }
             steps {
-                script {
-                    sshagent(credentials: ['sshagent-acc']) {
-                        sh '''
-                            curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
-                        '''
-                    }
+                // script {
+                //     sshagent(credentials: ['sshagent-acc']) {
+                //         sh '''
+                //             curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
+                //         '''
+                //     }
+                // }
+                sshagent(credentials: ['sshagent-acc']) {
+                    sh '''
+                        curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
+                    '''
                 }
             }
             // steps {
@@ -113,12 +116,17 @@ pipeline {
                 branch 'main'
             }
             steps {
-                script {
-                    sshagent(credentials: ['sshagent-acc']) {
-                        sh '''
-                            java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
-                        '''
-                    }
+                // script {
+                //     sshagent(credentials: ['sshagent-acc']) {
+                //         sh '''
+                //             java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
+                //         '''
+                //     }
+                // }
+                sshagent(credentials: ['sshagent-acc']) {
+                    sh '''
+                        java -jar /tmp/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar
+                    '''
                 }
             }
             
