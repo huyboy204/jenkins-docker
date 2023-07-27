@@ -10,7 +10,7 @@ pipeline {
         NEXUS_REPOSITORY = "java-repo"
         NEXUS_CREDENTIAL_ID = "nexus-credential"
     }
-    
+
     stages {
         stage('Unit Test with JUnit') {
             steps {
@@ -74,7 +74,7 @@ pipeline {
                     repository: 'java-repo',
                     credentialsId: '$(NEXUS_CREDENTIAL_ID)',
                     artifacts: [
-                        [artifactId: Spring-RELEASE,
+                        [artifactId: 'Spring-RELEASE',
                         classifier: '',
                         file: 'PetClinic-' + version + '.jar',
                         type: 'jar']
