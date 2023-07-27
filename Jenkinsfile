@@ -94,7 +94,8 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh "curl -v -u ${NEXUS_CREDENTIAL_ID} -o /tmp/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar http://${NEXUS_URL}/repository/${NEXUS_PRO_REPO}/${NEXUS_GROUP}/${NEXUS_ARTIFACT_ID}/${ARTIFACT_VERS}/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar"
+                echo "${NEXUS_CREDENTIAL_ID}"
+                //sh "curl -v -u ${NEXUS_CREDENTIAL_ID} -o /tmp/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar http://${NEXUS_URL}/repository/${NEXUS_PRO_REPO}/${NEXUS_GROUP}/${NEXUS_ARTIFACT_ID}/${ARTIFACT_VERS}/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar"
             }
         }
     }
