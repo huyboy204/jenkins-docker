@@ -70,7 +70,7 @@ pipeline {
                     protocol: 'http',
                     nexusUrl: "${NEXUS_URL}",
                     groupId: 'Product',
-                    version: "1.${env.BUILD_ID}-${new Date().format('yyMMddHHmm')}",
+                    version: "1.${env.BUILD_ID}-${new Date().format('yyMMdd_HHmm')}",
                     repository: 'java-repo',
                     credentialsId: "${NEXUS_CREDENTIAL_ID}",
                     artifacts: [
