@@ -16,7 +16,7 @@ pipeline {
             }
         }
         
-        stage('Check with SonarQube') {
+        stage('Check with SonarQube with branch Main') {
             when {
                 branch 'main'
             }
@@ -28,7 +28,7 @@ pipeline {
             }
         }
 
-        stage('Check with SonarQube') {
+        stage('Check with SonarQube with branch Dev') {
             when {
                 branch 'develop'
             }
@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stage('Check with SonarQube') {
+        stage('Check with SonarQube with branch Feature') {
             when {
                 branch 'feature'
             }
