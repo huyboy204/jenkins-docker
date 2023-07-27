@@ -110,5 +110,17 @@ pipeline {
             }
             
         }
+
+        stage('Health check Web') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sleep(time: 30, unit: 'SECONDS')
+                def response = httpRequest "http://192.168.56.120:8080/"
+                println("Status: ${response.status}")
+            }
+            
+        }
     }
 }
