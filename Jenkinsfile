@@ -76,7 +76,7 @@ pipeline {
                     artifacts: [
                         [artifactId: 'Spring-RELEASE',
                         classifier: '',
-                        file: 'spring-petclinic-3.1.0-SNAPSHOT.jar',
+                        file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
                         type: 'jar']
                     ]
                 )
