@@ -70,13 +70,13 @@ pipeline {
                     protocol: 'http',
                     nexusUrl: "${NEXUS_URL}",
                     groupId: 'Product',
-                    version: "${env.BUILD_ID}",
+                    version: "1.${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
                     repository: 'java-repo',
                     credentialsId: "${NEXUS_CREDENTIAL_ID}",
                     artifacts: [
                         [artifactId: 'Spring-RELEASE',
                         classifier: '',
-                        file: 'PetClinic-' + version + '.jar',
+                        file: 'PetClinic.jar',
                         type: 'jar']
                     ]
                 )
