@@ -5,11 +5,12 @@ pipeline {
         jdk 'Java17'
     }
 
-    environments {
+    environment {
         NEXUS_URL = "192.168.56.103:8081"
         NEXUS_REPOSITORY = "java-repo"
         NEXUS_CREDENTIAL_ID = "nexus-credential"
     }
+    
     stages {
         stage('Unit Test with JUnit') {
             steps {
