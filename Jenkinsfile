@@ -68,11 +68,11 @@ pipeline {
                 nexusArtifactUploader(
                     nexusVersion: 'nexus3',
                     protocol: 'http',
-                    nexusUrl: '$(NEXUS_URL)',
+                    nexusUrl: "${NEXUS_URL}",
                     groupId: 'Product',
-                    version: 'test',
+                    version: "${env.BUILD_ID}",
                     repository: 'java-repo',
-                    credentialsId: '$(NEXUS_CREDENTIAL_ID)',
+                    credentialsId: "${NEXUS_CREDENTIAL_ID}",
                     artifacts: [
                         [artifactId: 'Spring-RELEASE',
                         classifier: '',
