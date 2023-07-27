@@ -7,7 +7,8 @@ pipeline {
 
     environment {
         NEXUS_USER = "jenkins-user"
-        NEXUS_PASS = "20042001Huy@" 
+        NEXUS_PASS = "20042001Huy@"
+        NEXUS_ACC = credentials('nexus-credential')
         NEXUS_URL = "192.168.56.103:8081"
         NEXUS_REPOSITORY = "java-repo"
         NEXUS_CREDENTIAL_ID = "nexus-credential"
@@ -94,7 +95,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                echo "${NEXUS_CREDENTIAL_ID}"
+                echo "${NEXUS_ACC}"
                 //sh "curl -v -u ${NEXUS_CREDENTIAL_ID} -o /tmp/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar http://${NEXUS_URL}/repository/${NEXUS_PRO_REPO}/${NEXUS_GROUP}/${NEXUS_ARTIFACT_ID}/${ARTIFACT_VERS}/${NEXUS_ARTIFACT_ID}-${ARTIFACT_VERS}.jar"
             }
         }
