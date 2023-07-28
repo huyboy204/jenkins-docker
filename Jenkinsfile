@@ -136,17 +136,21 @@ pipeline {
                     //     error "Failed to perform health check: ${e}"
                     // }
                     // // Customize the Slack message
-                    // def slackMessage = "Website health check result:\n"
-                    // slackMessage += "Website URL: https://example.com\n"
-                    // slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    // slackMessage += "Status: ${currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
-
-                    // // Send the Slack message
-                    // slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
-                    // def response = httpRequest ignoreSslErrors: true, responseHandle: 'NONE', url: 'http://192.168.56.120:8080/actuator/health', wrapAsMultipart: false
-                    def response = httpRequest url: 'http://192.168.56.120:8080/actuator/health'
+                    def response = httpRequest url: 'http://192.168.56.120:8080'
                     println("Status: "+response.status)
                 }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                def slackMessage = "Build result:\n"
+                    slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
+                    slackMessage += "Status: ${currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
+
+                    // Send the Slack message
+                    slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
             }
         }
     }
