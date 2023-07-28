@@ -142,7 +142,8 @@ pipeline {
 
                     // // Send the Slack message
                     // slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
-                    def response = httpRequest ignoreSslErrors: true, responseHandle: 'NONE', url: 'http://192.168.56.120:8080', wrapAsMultipart: false
+                    // def response = httpRequest ignoreSslErrors: true, responseHandle: 'NONE', url: 'http://192.168.56.120:8080/actuator/health', wrapAsMultipart: false
+                    def response = httpRequest url: 'http://192.168.56.120:8080/actuator/health'
                     println("Status: "+response.status)
                 }
             }
