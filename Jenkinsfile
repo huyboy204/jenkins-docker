@@ -35,14 +35,14 @@ pipeline {
             }
         }
         
-        stage('Check with SonarQube with branch Main') {
+        stage('Check with SonarQube ') {
             when {
                 branch 'main'
             }
             steps {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
                 withSonarQubeEnv('sonarqube-server') {
-                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-main -Dsonar.projectName='Spring project main'"
+                   sh "'./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-${BRANCH_NAME} -Dsonar.projectName='Spring project ${BRANCH_NAME}'"
                 }
             }
             post {
@@ -55,45 +55,45 @@ pipeline {
             }
         }
 
-        stage('Check with SonarQube with branch Dev') {
-            when {
-                branch 'dev'
-            }
-            steps {
-                // Use SonarQube Scanner plugin to analyze your code. For example:
-                withSonarQubeEnv('sonarqube-server') {
-                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-dev -Dsonar.projectName='Spring project dev'"
-                }
-            }
-            post {
-                failure {
-                    script {
-                        FAILED_STAGE_NAME = "Check with SonarQube with branch Dev"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-                    }
-                }
-            }
-        }
+        // stage('Check with SonarQube with branch Dev') {
+        //     when {
+        //         branch 'dev'
+        //     }
+        //     steps {
+        //         // Use SonarQube Scanner plugin to analyze your code. For example:
+        //         withSonarQubeEnv('sonarqube-server') {
+        //            sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-dev -Dsonar.projectName='Spring project dev'"
+        //         }
+        //     }
+        //     post {
+        //         failure {
+        //             script {
+        //                 FAILED_STAGE_NAME = "Check with SonarQube with branch Dev"
+        //                 FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Check with SonarQube with branch Feature') {
-            when {
-                branch 'feature'
-            }
-            steps {
-                // Use SonarQube Scanner plugin to analyze your code. For example:
-                withSonarQubeEnv('sonarqube-server') {
-                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-feature -Dsonar.projectName='Spring project feature'"
-                }
-            }
-            post {
-                failure {
-                    script {
-                        FAILED_STAGE_NAME = "Check with SonarQube with branch Feature"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-                    }
-                }
-            }
-        }
+        // stage('Check with SonarQube with branch Feature') {
+        //     when {
+        //         branch 'feature'
+        //     }
+        //     steps {
+        //         // Use SonarQube Scanner plugin to analyze your code. For example:
+        //         withSonarQubeEnv('sonarqube-server') {
+        //            sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-feature -Dsonar.projectName='Spring project feature'"
+        //         }
+        //     }
+        //     post {
+        //         failure {
+        //             script {
+        //                 FAILED_STAGE_NAME = "Check with SonarQube with branch Feature"
+        //                 FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Push artifact to Nexus Repo') {
             when {
@@ -194,8 +194,6 @@ pipeline {
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
                 slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
-                sh 'echo $PRJ_NAME'
-                sh 'echo $BRANCH_NAME'
             }
         }
         failure {
