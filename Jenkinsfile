@@ -119,8 +119,8 @@ pipeline {
             post {
                 failure {
                     script {
-                        FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        ${FAILED_STAGE_NAME} = "Push artifact to Nexus Repo"
+                        ${FAILED_STAGE_LOG} = currentBuild.rawBuild.getLog(10000)
                     }
                 }
             }
@@ -138,8 +138,8 @@ pipeline {
             post {
                 failure {
                     script {
-                        FAILED_STAGE_NAME = "Pull artifact on VM"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        ${FAILED_STAGE_NAME} = "Pull artifact on VM"
+                        ${FAILED_STAGE_LOG} = currentBuild.rawBuild.getLog(10000)
                     }
                 }
             }
@@ -157,8 +157,8 @@ pipeline {
             post {
                 failure {
                     script {
-                        FAILED_STAGE_NAME = "Deploy artifact"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        ${FAILED_STAGE_NAME} = "Deploy artifact"
+                        ${FAILED_STAGE_LOG} = currentBuild.rawBuild.getLog(10000)
                     }
                 }
             }
@@ -179,8 +179,8 @@ pipeline {
             post {
                 failure {
                     script {
-                        FAILED_STAGE_NAME = "Health check Web"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        ${FAILED_STAGE_NAME} = "Health check Web"
+                        ${FAILED_STAGE_LOG} = currentBuild.rawBuild.getLog(10000)
                     }
                 }
             }
