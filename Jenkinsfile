@@ -55,46 +55,6 @@ pipeline {
             }
         }
 
-        // stage('Check with SonarQube with branch Dev') {
-        //     when {
-        //         branch 'dev'
-        //     }
-        //     steps {
-        //         // Use SonarQube Scanner plugin to analyze your code. For example:
-        //         withSonarQubeEnv('sonarqube-server') {
-        //            sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-dev -Dsonar.projectName='Spring project dev'"
-        //         }
-        //     }
-        //     post {
-        //         failure {
-        //             script {
-        //                 FAILED_STAGE_NAME = "Check with SonarQube with branch Dev"
-        //                 FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage('Check with SonarQube with branch Feature') {
-        //     when {
-        //         branch 'feature'
-        //     }
-        //     steps {
-        //         // Use SonarQube Scanner plugin to analyze your code. For example:
-        //         withSonarQubeEnv('sonarqube-server') {
-        //            sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-feature -Dsonar.projectName='Spring project feature'"
-        //         }
-        //     }
-        //     post {
-        //         failure {
-        //             script {
-        //                 FAILED_STAGE_NAME = "Check with SonarQube with branch Feature"
-        //                 FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-        //             }
-        //         }
-        //     }
-        // }
-
         stage('Push artifact to Nexus Repo') {
             when {
                 branch 'main'
@@ -201,7 +161,6 @@ pipeline {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
                     slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
-                    slackMessage += "Stage Log:\n${FAILED_STAGE_LOG}"
                 // Send the Slack message
                 slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
             }
