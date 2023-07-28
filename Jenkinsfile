@@ -13,7 +13,9 @@ pipeline {
         NEXUS_PRO_REPO = "java-repo"
         NEXUS_GROUP = "Product"
         NEXUS_ARTIFACT_ID = "Spring-RELEASE"
-        ARTIFACT_VERS = "1.${env.BUILD_ID}-${new Date().format('yyMMdd-HHmm')}"
+        ARTIFACT_VERS = "1.${env.BUILD_ID}"
+        FAILED_STAGE_NAME = ""
+        FAILED_STAGE_LOG = ""        
     }
 
     stages {
@@ -22,9 +24,13 @@ pipeline {
                 sh './mvnw test'
             }
             post {
-                always {
+                failure {
                     // Archive the JUnit test results for later viewing in Jenkins
                     junit '**/target/surefire-reports/TEST-*.xml'
+                    script {
+                        FAILED_STAGE_NAME = "Unit Test with JUnit"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
                 }
             }
         }
@@ -39,6 +45,14 @@ pipeline {
                    sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-main -Dsonar.projectName='Spring project main'"
                 }
             }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Check with SonarQube with branch Main"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
+                }
+            }
         }
 
         stage('Check with SonarQube with branch Dev') {
@@ -51,6 +65,14 @@ pipeline {
                    sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-dev -Dsonar.projectName='Spring project dev'"
                 }
             }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Check with SonarQube with branch Dev"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
+                }
+            }
         }
 
         stage('Check with SonarQube with branch Feature') {
@@ -61,6 +83,14 @@ pipeline {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
                 withSonarQubeEnv('sonarqube-server') {
                    sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-feature -Dsonar.projectName='Spring project feature'"
+                }
+            }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Check with SonarQube with branch Feature"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
                 }
             }
         }
@@ -86,6 +116,14 @@ pipeline {
                     ]
                 )
             }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
+                }
+            }
         }
 
         stage('Pull artifact on VM') {
@@ -95,6 +133,14 @@ pipeline {
             steps {
                 sshagent(['sshagent-acc']) {
                     sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                }
+            }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Pull artifact on VM"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
                 }
             }
         }
@@ -108,6 +154,14 @@ pipeline {
                     sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
                 }
             }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Deploy artifact"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
+                }
+            }
             
         }
 
@@ -118,26 +172,16 @@ pipeline {
             steps {
                 script {
                     sleep(10)
-                    // try {
-                    //     // Replace 'example.com' with the website URL you want to health check
-                    //     def websiteURL = "https://google.com"
-                    //     def response = sh(
-                    //         script: "curl -sL -w '%{http_code}' '${websiteURL}' -o /dev/null",
-                    //         returnStatus: true
-                    //     )
-                        
-                    //     // Check if the response status code indicates a successful health check (2xx range)
-                    //     if (response == 200 || response == 201 || response == 204) {
-                    //         echo "Website is healthy. Status code: ${response}"
-                    //     } else {
-                    //         error "Website health check failed. Status code: ${response}"
-                    //     }
-                    // } catch (Exception e) {
-                    //     error "Failed to perform health check: ${e}"
-                    // }
-                    // // Customize the Slack message
                     def response = httpRequest url: 'http://192.168.56.120:8080'
                     println("Status: "+response.status)
+                }
+            }
+            post {
+                failure {
+                    script {
+                        FAILED_STAGE_NAME = "Health check Web"
+                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                    }
                 }
             }
         }
@@ -145,12 +189,21 @@ pipeline {
     post {
         success {
             script {
-                def slackMessage = "Build result:\n"
+                def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    slackMessage += "Status: ${currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
-
-                    // Send the Slack message
-                    slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+                    slackMessage += "Status: SUCCESS"
+                // Send the Slack message
+                slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+            }
+        }
+        failure {
+            script {
+                def slackMessage = "Pipeline result:\n"
+                    slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
+                    slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
+                    slackMessage += "Stage Log:\n${FAILED_STAGE_LOG}"
+                // Send the Slack message
+                slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
             }
         }
     }
