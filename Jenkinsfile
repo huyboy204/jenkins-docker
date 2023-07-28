@@ -22,8 +22,6 @@ pipeline {
         stage('Unit Test with JUnit') {
             steps {
                 sh './mvnw test'
-                sh 'echo $PRJ_NAME'
-                sh 'echo $BRANCH_NAME'
             }
             post {
                 failure {
@@ -196,6 +194,8 @@ pipeline {
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
                 slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+                sh 'echo $PRJ_NAME'
+                sh 'echo $BRANCH_NAME'
             }
         }
         failure {
