@@ -42,13 +42,13 @@ pipeline {
             steps {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
                 withSonarQubeEnv('sonarqube-server') {
-                   sh "'./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-${BRANCH_NAME} -Dsonar.projectName='Spring project ${BRANCH_NAME}'"
+                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-${BRANCH_NAME} -Dsonar.projectName='Spring project ${BRANCH_NAME}'"
                 }
             }
             post {
                 failure {
                     script {
-                        FAILED_STAGE_NAME = "Check with SonarQube with branch Main"
+                        FAILED_STAGE_NAME = "Check with SonarQube with branch ${BRANCH_NAME}"
                         FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
                     }
                 }
