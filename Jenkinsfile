@@ -115,7 +115,8 @@ pipeline {
             when {
                 branch 'main'
             }
-            script {
+            steps {
+                script {
                     try {
                         // Replace 'example.com' with the website URL you want to health check
                         def websiteURL = 'http://192.168.56.120:8080'
@@ -142,6 +143,7 @@ pipeline {
                     // Send the Slack message
                     slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
                 }
+            }
         }
     }
 }
