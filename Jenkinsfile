@@ -119,7 +119,7 @@ pipeline {
                 script {
                     try {
                         // Replace 'example.com' with the website URL you want to health check
-                        def websiteURL = 'http://192.168.56.120:8080'
+                        def websiteURL = "http://192.168.56.120:8080"
                         def response = sh(
                             script: "curl -sL -w '%{http_code}' '${websiteURL}' -o /dev/null",
                             returnStatus: true
