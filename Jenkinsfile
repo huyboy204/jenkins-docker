@@ -57,7 +57,7 @@ pipeline {
 
         stage('Check with SonarQube with branch Dev') {
             when {
-                branch 'develop'
+                branch 'dev'
             }
             steps {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
@@ -194,6 +194,8 @@ pipeline {
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
                 slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+                println('$PRJ_NAME')
+                println('BRANCH_NAME')
             }
         }
         failure {
