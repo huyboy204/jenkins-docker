@@ -115,13 +115,33 @@ pipeline {
             when {
                 branch 'main'
             }
-            steps {
-                script {
-                    sleep(time: 30, unit: 'SECONDS')
-                    //def web_response = httpRequest "http://192.168.56.120:8080"
-                    println("Status: ${web_response.status}")
+            script {
+                    try {
+                        // Replace 'example.com' with the website URL you want to health check
+                        def websiteURL = 'http://192.168.56.120:8080'
+                        def response = sh(
+                            script: "curl -sL -w '%{http_code}' '${websiteURL}' -o /dev/null",
+                            returnStatus: true
+                        )
+                        
+                        // Check if the response status code indicates a successful health check (2xx range)
+                        if (response == 200 || response == 201 || response == 204) {
+                            echo "Website is healthy. Status code: ${response}"
+                        } else {
+                            error "Website health check failed. Status code: ${response}"
+                        }
+                    } catch (Exception e) {
+                        error "Failed to perform health check: ${e}"
+                    }
+                    // Customize the Slack message
+                    def slackMessage = "Website health check result:\n"
+                    slackMessage += "Website URL: https://example.com\n"
+                    slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
+                    slackMessage += "Status: ${currentBuild.currentResult == 'SUCCESS' ? 'SUCCESS' : 'FAILURE'}"
+
+                    // Send the Slack message
+                    slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
                 }
-            }
         }
     }
 }
