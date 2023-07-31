@@ -32,13 +32,12 @@ pipeline {
                         throw error
                     }
                 }
-                post {
+            }
+            post {
                     always {
                         junit '**/target/surefire-reports/TEST-*.xml'
                     }
                 }
-                
-            }
         }
         
         stage('Check with SonarQube ') {
