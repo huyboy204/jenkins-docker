@@ -21,7 +21,16 @@ pipeline {
     stages {
         stage('Unit Test with JUnit') {
             steps {
-                sh './mvnw test'
+                script {
+                    try {
+                        sh './mvnw test'
+                        sh 'letsGenerateAError'
+                    } catch (error) {
+                        FAILED_STAGE_NAME = "Unit Test with JUnit"
+                        FAILED_STAGE_LOG = "${error.getMessages()}"
+                    }
+                }
+                
             }
             post {
                 failure {
