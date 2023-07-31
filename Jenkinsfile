@@ -110,7 +110,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
                             sshagent(['ssh-vm-docker']) {
                             sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
-                            sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
+                            sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 -n web ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
                         }
                         }
                     } catch(error) {
@@ -130,7 +130,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sleep(10)
+                        sleep(30)
                         def response = httpRequest url: 'http://192.168.56.103:8080'
                         println("Status: "+response.status)
                     } catch(error) {
