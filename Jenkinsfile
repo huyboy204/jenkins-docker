@@ -56,31 +56,38 @@ pipeline {
             }
         }
 
-        stage('Push artifact to Nexus Repo') {
+        stage('Build docker image') {
             when {
                 branch 'main'
             }
             steps {
                 script {
                     try {
-                        nexusArtifactUploader(
-                            nexusVersion: 'nexus3',
-                            protocol: 'http',
-                            nexusUrl: "${NEXUS_URL}",
-                            groupId: "${NEXUS_GROUP}",
-                            version: "${ARTIFACT_VERS}",
-                            repository: "${NEXUS_PRO_REPO}",
-                            credentialsId: "${NEXUS_CREDENTIAL_ID}",
-                            artifacts: [
-                                [artifactId: "${NEXUS_ARTIFACT_ID}",
-                                classifier: '',
-                                file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
-                                type: 'jar']
-                            ]
-                        )
+                        sh "docker build -t ${NEXUS_URL}/web:${ARTIFACT_VERS} ."
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
-                        FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
+                        FAILED_STAGE_NAME = "Build docker image"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
+                    }
+                }
+            }
+        }
+
+        stage('Push docker image to Nexus Repo') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    try {
+                        withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
+                            sh "echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL}"
+                            sh "docker push ${NEXUS_URL}/web:${ARTIFACT_VERS}"
+                        }
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
+                        FAILED_STAGE_NAME = "Push docker image to Nexus Repo"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
                         throw error
                     }
@@ -148,6 +155,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             script {
