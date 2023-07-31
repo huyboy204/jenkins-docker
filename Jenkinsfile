@@ -32,6 +32,11 @@ pipeline {
                         throw error
                     }
                 }
+                post {
+                    always {
+                        junit '**/target/surefire-reports/TEST-*.xml'
+                    }
+                }
                 
             }
         }
