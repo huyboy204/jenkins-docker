@@ -28,6 +28,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Unit Test with JUnit"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
                 
@@ -59,6 +60,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Check with SonarQube with branch ${BRANCH_NAME}"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
             }
@@ -98,6 +100,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
             }
@@ -125,6 +128,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Pull artifact on VM"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
             }
@@ -152,6 +156,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Deploy artifact"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
                 // sshagent(['sshagent-acc']) {
@@ -182,6 +187,7 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Health check Web"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
                     }
                 }
             }
