@@ -160,7 +160,7 @@ pipeline {
             }
             mail to: "huyboy204@gmail.com",
             subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - SUCCESS!",
-            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - SUCCESS: Check console output at ${BUILD_URL} to view the results."
+            body: "Check console output at ${BUILD_URL} to view the results."
         }
         failure {
             script {
@@ -174,7 +174,7 @@ pipeline {
             }
             mail to: "huyboy204@gmail.com",
             subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - FAILURE!",
-            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - FAILURE: Check console output at ${BUILD_URL} to view the results."
+            body: "Failed Log: ${FAILED_STAGE_LOG}. Check console output at ${BUILD_URL} to view the results."
         }
     }
 }
