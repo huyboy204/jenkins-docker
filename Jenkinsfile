@@ -212,7 +212,7 @@ pipeline {
                 slackSend color: 'good', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: "Test Email",
+            subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
             body: slackMessage
         }
         failure {
@@ -226,7 +226,7 @@ pipeline {
                 slackSend color: 'danger', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: "Test Email",
+            subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
             body: slackMessage
         }
     }
