@@ -212,6 +212,7 @@ pipeline {
                 slackSend color: 'good', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
+            subject: "Test Email",
             body: slackMessage
         }
         failure {
@@ -225,6 +226,7 @@ pipeline {
                 slackSend color: 'danger', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
+            subject: "Test Email",
             body: slackMessage
         }
     }
