@@ -8,6 +8,7 @@ pipeline {
     environment {
         NEXUS_ACC = credentials('nexus-credential')
         NEXUS_URL = "192.168.56.103:8081"
+        NEXUS_URL2 = "192.168.56.103:8082"
         NEXUS_REPOSITORY = "java-repo"
         NEXUS_CREDENTIAL_ID = "nexus-credential"
         NEXUS_PRO_REPO = "java-repo"
@@ -63,7 +64,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh "docker build -t ${NEXUS_URL}/web:${ARTIFACT_VERS} ."
+                        sh "docker build -t ${NEXUS_URL2}/web:${ARTIFACT_VERS} ."
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Build docker image"
@@ -82,8 +83,8 @@ pipeline {
                 script {
                     try {
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
-                            sh "echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL}"
-                            sh "docker push ${NEXUS_URL}/web:${ARTIFACT_VERS}"
+                            sh "echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}"
+                            sh "docker push ${NEXUS_URL2}/web:${ARTIFACT_VERS}"
                         }
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
