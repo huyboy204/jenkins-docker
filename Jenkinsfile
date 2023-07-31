@@ -213,7 +213,7 @@ pipeline {
             }
             mail to: "huyboy204@gmail.com",
             subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-            body: "${slackMessage}"
+            body: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS: Check console output at $BUILD_URL to view the results.'
         }
         failure {
             script {
@@ -227,7 +227,7 @@ pipeline {
             }
             mail to: "huyboy204@gmail.com",
             subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-            body: "${slackMessage}"
+            body: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS: Check console output at $BUILD_URL to view the results.'
         }
     }
 }
