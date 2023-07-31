@@ -83,32 +83,12 @@ pipeline {
                 script {
                     try {
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
-                            sh "echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}"
+                            sh 'echo $PSW | docker login -u $USER --password-stdin $NEXUS_URL2'
                             sh "docker push ${NEXUS_URL2}/web:${ARTIFACT_VERS}"
                         }
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Push docker image to Nexus Repo"
-                        FAILED_STAGE_LOG = "${error.getMessage()}"
-                        throw error
-                    }
-                }
-            }
-        }
-
-        stage('Pull artifact on VM') {
-            when {
-                branch 'main'
-            }
-            steps {
-                script {
-                    try {
-                        sshagent(['sshagent-acc']) {
-                            sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
-                        }
-                    } catch(error) {
-                        echo "Error occurred while Running. Message : ${error.getMessage()}"
-                        FAILED_STAGE_NAME = "Pull artifact on VM"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
                         throw error
                     }
@@ -123,8 +103,14 @@ pipeline {
             steps {
                 script {
                     try {
-                        sshagent(['sshagent-acc']) {
-                            sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
+                        withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
+                            sshagent(['ssh-vm-docker']) {
+                            sh '''
+                                ssh root@192.168.56.103
+                                echo $PSW | docker login -u $USER --password-stdin $NEXUS_URL2
+                                docker run -d -p 8080:8080 $NEXUS_URL2/web:$ARTIFACT_VERS
+                                '''
+                        }
                         }
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
@@ -144,7 +130,7 @@ pipeline {
                 script {
                     try {
                         sleep(10)
-                        def response = httpRequest url: 'http://192.168.56.120:8080'
+                        def response = httpRequest url: 'http://192.168.56.103:8080'
                         println("Status: "+response.status)
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
