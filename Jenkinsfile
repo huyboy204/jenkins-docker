@@ -159,8 +159,8 @@ pipeline {
                 slackSend color: 'good', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!",
-            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}: Check console output at ${BUILD_URL} to view the results."
+            subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - SUCCESS!",
+            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - SUCCESS: Check console output at ${BUILD_URL} to view the results."
         }
         failure {
             script {
@@ -173,8 +173,8 @@ pipeline {
                 slackSend color: 'danger', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!",
-            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}: Check console output at ${BUILD_URL} to view the results."
+            subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - FAILURE!",
+            body: "${JOB_NAME} - Build # ${BUILD_NUMBER} - FAILURE: Check console output at ${BUILD_URL} to view the results."
         }
     }
 }
