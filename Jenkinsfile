@@ -26,8 +26,9 @@ pipeline {
                         sh './mvnw test'
                         sh 'letsGenerateAError'
                     } catch (error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Unit Test with JUnit"
-                        FAILED_STAGE_LOG = "${error.getMessages()}"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
                 
@@ -162,17 +163,17 @@ pipeline {
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
-                slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+                slackSend color: 'good', message: slackMessage
             }
         }
         failure {
             script {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
-                    slackMessage += "Failed Log: ${FAILED_STAGE_LOG}\n"
+                    slackMessage += "Failed Stage: ${FAILED_STAGE_LOG}\n"
+                    slackMessage += "Failed Log: ${FAILED_STAGE_NAME}\n"
                 // Send the Slack message
-                slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
+                slackSend color: 'danger', message: slackMessage
             }
         }
     }
