@@ -109,11 +109,11 @@ pipeline {
                     try {
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
                             sshagent(['ssh-vm-docker']) {
-                            sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
-                            sh "ssh root@192.168.56.103 'docker stop web'"
-                            sh "ssh root@192.168.56.103 'docker remove web'"
-                            sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
-                        }
+                                sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
+                                sh "ssh root@192.168.56.103 'docker stop web'"
+                                sh "ssh root@192.168.56.103 'docker remove web'"
+                                sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
+                            }
                         }
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
@@ -139,6 +139,17 @@ pipeline {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Health check Web"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
+                        withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
+                            sshagent(['ssh-vm-docker']) {
+                                def rollback = env.ARTIFACT_VERS -1
+                                env.ROLLBACK_VERS = rollback
+                                sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
+                                sh "ssh root@192.168.56.103 'docker stop web'"
+                                sh "ssh root@192.168.56.103 'docker remove web'"
+                                sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:${env.ROLLBACK_VERS}'"
+                            }
+                        }
+                        echo "Had Rollback to version ${env.ROLLBACK_VERS}"
                         throw error
                     }
                 }
@@ -155,6 +166,8 @@ pipeline {
                     slackMessage += "${BUILD_URL}"
                 // Send the Slack message
                 slackSend color: 'good', message: slackMessage
+                
+                echo "Had Rollback to version ${env.ROLLBACK_VERS}"
             }
             mail to: "huyboy204@gmail.com",
             subject: "${JOB_NAME} - Build # ${BUILD_NUMBER} - SUCCESS!",
