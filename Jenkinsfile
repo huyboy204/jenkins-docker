@@ -200,6 +200,7 @@ pipeline {
             script {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
+                    slackMessage += "Failed Stage: ${FAILED_STAGE_LOG}\n"
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
                 slackSend color: 'good', message: slackMessage
