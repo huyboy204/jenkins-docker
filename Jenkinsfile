@@ -32,16 +32,16 @@ pipeline {
                 }
                 
             }
-            post {
-                failure {
-                    // Archive the JUnit test results for later viewing in Jenkins
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    script {
-                        FAILED_STAGE_NAME = "Unit Test with JUnit"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-                    }
-                }
-            }
+            // post {
+            //     failure {
+            //         // Archive the JUnit test results for later viewing in Jenkins
+            //         junit '**/target/surefire-reports/TEST-*.xml'
+            //         script {
+            //             FAILED_STAGE_NAME = "Unit Test with JUnit"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
         
         stage('Check with SonarQube ') {
@@ -170,6 +170,7 @@ pipeline {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
                     slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
+                    slackMessage += "Failed Log: ${FAILED_STAGE_LOG}\n"
                 // Send the Slack message
                 slackSend color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger', message: slackMessage
             }
