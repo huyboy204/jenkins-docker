@@ -23,8 +23,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh './mvnw test'
-                        sh 'letsGenerateAError'
+                        sh './mvnw testt'
                     } catch (error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Unit Test with JUnit"
@@ -51,18 +50,26 @@ pipeline {
             }
             steps {
                 // Use SonarQube Scanner plugin to analyze your code. For example:
-                withSonarQubeEnv('sonarqube-server') {
-                   sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-${BRANCH_NAME} -Dsonar.projectName='Spring project ${BRANCH_NAME}'"
-                }
-            }
-            post {
-                failure {
-                    script {
+                script {
+                    try {
+                        withSonarQubeEnv('sonarqube-server') {
+                            sh "./mvnw clean verify sonar:sonar -Dsonar.projectKey=Spring-project-${BRANCH_NAME} -Dsonar.projectName='Spring project ${BRANCH_NAME}'"
+                        }
+                    } catch (error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Check with SonarQube with branch ${BRANCH_NAME}"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
             }
+            // post {
+            //     failure {
+            //         script {
+            //             FAILED_STAGE_NAME = "Check with SonarQube with branch ${BRANCH_NAME}"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
 
         stage('Push artifact to Nexus Repo') {
@@ -70,30 +77,38 @@ pipeline {
                 branch 'main'
             }
             steps {
-                nexusArtifactUploader(
-                    nexusVersion: 'nexus3',
-                    protocol: 'http',
-                    nexusUrl: "${NEXUS_URL}",
-                    groupId: "${NEXUS_GROUP}",
-                    version: "${ARTIFACT_VERS}",
-                    repository: "${NEXUS_PRO_REPO}",
-                    credentialsId: "${NEXUS_CREDENTIAL_ID}",
-                    artifacts: [
-                        [artifactId: "${NEXUS_ARTIFACT_ID}",
-                        classifier: '',
-                        file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
-                        type: 'jar']
-                    ]
-                )
-            }
-            post {
-                failure {
-                    script {
+                script {
+                    try {
+                        nexusArtifactUploader(
+                            nexusVersion: 'nexus3',
+                            protocol: 'http',
+                            nexusUrl: "${NEXUS_URL}",
+                            groupId: "${NEXUS_GROUP}",
+                            version: "${ARTIFACT_VERS}",
+                            repository: "${NEXUS_PRO_REPO}",
+                            credentialsId: "${NEXUS_CREDENTIAL_ID}",
+                            artifacts: [
+                                [artifactId: "${NEXUS_ARTIFACT_ID}",
+                                classifier: '',
+                                file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
+                                type: 'jar']
+                            ]
+                        )
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
             }
+            // post {
+            //     failure {
+            //         script {
+            //             FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
 
         stage('Pull artifact on VM') {
@@ -101,18 +116,26 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sshagent(['sshagent-acc']) {
-                    sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
-                }
-            }
-            post {
-                failure {
-                    script {
+                script {
+                    try {
+                        sshagent(['sshagent-acc']) {
+                            sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                        }
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Pull artifact on VM"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
             }
+            // post {
+            //     failure {
+            //         script {
+            //             FAILED_STAGE_NAME = "Pull artifact on VM"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
 
         stage('Deploy artifact') {
@@ -120,19 +143,29 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sshagent(['sshagent-acc']) {
-                    sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
-                }
-            }
-            post {
-                failure {
-                    script {
+                script {
+                    try {
+                        sshagent(['sshagent-acc']) {
+                            sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
+                        }
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Deploy artifact"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
+                // sshagent(['sshagent-acc']) {
+                //     sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
+                // }
             }
-            
+            // post {
+            //     failure {
+            //         script {
+            //             FAILED_STAGE_NAME = "Deploy artifact"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
 
         stage('Health check Web') {
@@ -141,19 +174,25 @@ pipeline {
             }
             steps {
                 script {
-                    sleep(10)
-                    def response = httpRequest url: 'http://192.168.56.120:8080'
-                    println("Status: "+response.status)
-                }
-            }
-            post {
-                failure {
-                    script {
+                    try {
+                        sleep(10)
+                        def response = httpRequest url: 'http://192.168.56.120:8080'
+                        println("Status: "+response.status)
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Health check Web"
-                        FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
                     }
                 }
             }
+            // post {
+            //     failure {
+            //         script {
+            //             FAILED_STAGE_NAME = "Health check Web"
+            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
+            //         }
+            //     }
+            // }
         }
     }
     post {
