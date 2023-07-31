@@ -33,16 +33,6 @@ pipeline {
                 }
                 
             }
-            // post {
-            //     failure {
-            //         // Archive the JUnit test results for later viewing in Jenkins
-            //         junit '**/target/surefire-reports/TEST-*.xml'
-            //         script {
-            //             FAILED_STAGE_NAME = "Unit Test with JUnit"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
         
         stage('Check with SonarQube ') {
@@ -64,14 +54,6 @@ pipeline {
                     }
                 }
             }
-            // post {
-            //     failure {
-            //         script {
-            //             FAILED_STAGE_NAME = "Check with SonarQube with branch ${BRANCH_NAME}"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
 
         stage('Push artifact to Nexus Repo') {
@@ -104,14 +86,6 @@ pipeline {
                     }
                 }
             }
-            // post {
-            //     failure {
-            //         script {
-            //             FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
 
         stage('Pull artifact on VM') {
@@ -132,14 +106,6 @@ pipeline {
                     }
                 }
             }
-            // post {
-            //     failure {
-            //         script {
-            //             FAILED_STAGE_NAME = "Pull artifact on VM"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
 
         stage('Deploy artifact') {
@@ -159,18 +125,7 @@ pipeline {
                         throw error
                     }
                 }
-                // sshagent(['sshagent-acc']) {
-                //     sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
-                // }
             }
-            // post {
-            //     failure {
-            //         script {
-            //             FAILED_STAGE_NAME = "Deploy artifact"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
 
         stage('Health check Web') {
@@ -191,14 +146,6 @@ pipeline {
                     }
                 }
             }
-            // post {
-            //     failure {
-            //         script {
-            //             FAILED_STAGE_NAME = "Health check Web"
-            //             FAILED_STAGE_LOG = currentBuild.rawBuild.getLog(10000)
-            //         }
-            //     }
-            // }
         }
     }
     post {
@@ -212,8 +159,8 @@ pipeline {
                 slackSend color: 'good', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-            body: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS: Check console output at $BUILD_URL to view the results.'
+            subject: "${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!",
+            body: "${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}: Check console output at ${BUILD_URL} to view the results."
         }
         failure {
             script {
@@ -226,8 +173,8 @@ pipeline {
                 slackSend color: 'danger', message: slackMessage
             }
             mail to: "huyboy204@gmail.com",
-            subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!',
-            body: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS: Check console output at $BUILD_URL to view the results.'
+            subject: "${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}!",
+            body: "${PROJECT_NAME} - Build # ${BUILD_NUMBER} - ${BUILD_STATUS}: Check console output at ${BUILD_URL} to view the results."
         }
     }
 }
