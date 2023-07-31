@@ -206,7 +206,8 @@ pipeline {
             script {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    slackMessage += "Status: SUCCESS"
+                    slackMessage += "Status: SUCCESS\n"
+                    slackMessage += "${BUILD_URL}"
                 // Send the Slack message
                 slackSend color: 'good', message: slackMessage
             }
@@ -217,6 +218,7 @@ pipeline {
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
                     slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
                     slackMessage += "Failed Log: ${FAILED_STAGE_LOG}\n"
+                    slackMessage += "${BUILD_URL}"
                 // Send the Slack message
                 slackSend color: 'danger', message: slackMessage
             }
