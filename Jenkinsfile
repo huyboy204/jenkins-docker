@@ -105,8 +105,7 @@ pipeline {
                     try {
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
                             sshagent(['ssh-vm-docker']) {
-                            sh '
-                                ssh root@192.168.56.103 \ echo $PSW | docker login -u $USER --password-stdin $NEXUS_URL2 \ docker run -d -p 8080:8080 $NEXUS_URL2/web:$ARTIFACT_VERS'
+                            sh 'ssh root@192.168.56.103 \ echo $PSW | docker login -u $USER --password-stdin $NEXUS_URL2 \ docker run -d -p 8080:8080 $NEXUS_URL2/web:$ARTIFACT_VERS'
                         }
                         }
                     } catch(error) {
