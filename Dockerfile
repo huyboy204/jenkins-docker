@@ -1,5 +1,5 @@
 # Use the official Alpine base image with OpenJDK 17 JRE
-FROM 19-jdk-alpine3.16
+FROM openjdk:17-alpine
 
 # Set the working directory in the container
 WORKDIR /app
