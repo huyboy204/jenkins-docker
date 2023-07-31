@@ -211,6 +211,8 @@ pipeline {
                 // Send the Slack message
                 slackSend color: 'good', message: slackMessage
             }
+            mail to: "huyboy204@gmail.com",
+            body: slackMessage
         }
         failure {
             script {
@@ -222,6 +224,8 @@ pipeline {
                 // Send the Slack message
                 slackSend color: 'danger', message: slackMessage
             }
+            mail to: "huyboy204@gmail.com",
+            body: slackMessage
         }
     }
 }
