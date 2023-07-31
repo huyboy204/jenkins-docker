@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh './mvnw testt'
+                        sh './mvnw test'
                     } catch (error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
                         FAILED_STAGE_NAME = "Unit Test with JUnit"
@@ -206,7 +206,6 @@ pipeline {
             script {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    slackMessage += "Failed Stage: ${FAILED_STAGE_LOG}\n"
                     slackMessage += "Status: SUCCESS"
                 // Send the Slack message
                 slackSend color: 'good', message: slackMessage
@@ -216,8 +215,8 @@ pipeline {
             script {
                 def slackMessage = "Pipeline result:\n"
                     slackMessage += "Jenkins Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER}\n"
-                    slackMessage += "Failed Stage: ${FAILED_STAGE_LOG}\n"
-                    slackMessage += "Failed Log: ${FAILED_STAGE_NAME}\n"
+                    slackMessage += "Failed Stage: ${FAILED_STAGE_NAME}\n"
+                    slackMessage += "Failed Log: ${FAILED_STAGE_LOG}\n"
                 // Send the Slack message
                 slackSend color: 'danger', message: slackMessage
             }
