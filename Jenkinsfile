@@ -112,7 +112,7 @@ pipeline {
                                 sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
                                 sh "ssh root@192.168.56.103 'docker stop web'"
                                 sh "ssh root@192.168.56.103 'docker remove web'"
-                                sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
+                                sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped -v logs_web:/logs ${NEXUS_URL2}/web:${ARTIFACT_VERS}'"
                             }
                         }
                     } catch(error) {
