@@ -13,5 +13,5 @@ EXPOSE 8080
 
 USER nobody
 
-# CMD ["java", "-jar", "spring-petclinic-3.1.0-SNAPSHOT.jar", "2>&1", "|", "tee", "/app/logs/logs.txt"]
-RUN java -jar spring-petclinic-3.1.0-SNAPSHOT.jar | tee /app/logs/logs.txt
+CMD ["java", "-jar", "spring-petclinic-3.1.0-SNAPSHOT.jar", "|", "tee", "/app/logs/logs.txt"]
+# RUN java -jar spring-petclinic-3.1.0-SNAPSHOT.jar | tee /app/logs/logs.txt
