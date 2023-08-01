@@ -147,8 +147,8 @@ pipeline {
                                 try {
                                     sh "ssh root@192.168.56.103 'docker stop web'"
                                     sh "ssh root@192.168.56.103 'docker remove web'"
-                                } catch(error) {
-                                    echo "Error occurred while Running. Message : ${error.getMessage()}"
+                                } catch(error1) {
+                                    echo "Error occurred while Running. Message : ${error1.getMessage()}"
                                 }
                                 sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:1.${env.ROLLBACK_VERS}'"
                             }
