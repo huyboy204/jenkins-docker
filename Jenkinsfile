@@ -146,13 +146,9 @@ pipeline {
                                 sh "ssh -o StrictHostKeyChecking=no root@192.168.56.103 'echo ${PSW} | docker login -u ${USER} --password-stdin ${NEXUS_URL2}'"
                                 try {
                                     sh "ssh root@192.168.56.103 'docker stop web'"
-                                } catch(error1) {
-                                    echo "Error occurred while Running. Message : ${error1.getMessage()}"
-                                }
-                                try {
                                     sh "ssh root@192.168.56.103 'docker remove web'"
-                                } catch(error2) {
-                                    echo "Error occurred while Running. Message : ${error2.getMessage()}"
+                                } catch(error) {
+                                    echo "Error occurred while Running. Message : ${error.getMessage()}"
                                 }
                                 sh "ssh root@192.168.56.103 'docker run -d -p 8080:8080 --name web --restart unless-stopped ${NEXUS_URL2}/web:1.${env.ROLLBACK_VERS}'"
                             }
