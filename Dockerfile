@@ -4,10 +4,9 @@ WORKDIR /app
 
 COPY target/spring-petclinic-3.1.0-SNAPSHOT.jar /app/spring-petclinic-3.1.0-SNAPSHOT.jar
 RUN chown nobody:nogroup /app/spring-petclinic-3.1.0-SNAPSHOT.jar
-RUN chown nobody:nogroup /logs
 
 EXPOSE 8080
 
 USER nobody
 
-CMD ["java", "-jar", "spring-petclinic-3.1.0-SNAPSHOT.jar", "2>&1", "|", "tee", "/logs/logs.txt"]
+CMD ["java", "-jar", "spring-petclinic-3.1.0-SNAPSHOT.jar", "2>&1", "|", "tee", "/app/logs/logs.txt"]
