@@ -125,7 +125,7 @@ pipeline {
             }
         }
 
-        stage('Health check Web') {
+        stage('Health check Web deploy with docker') {
             when {
                 branch 'main'
             }
@@ -137,7 +137,7 @@ pipeline {
                         println("Status: "+response.status)
                     } catch(error) {
                         echo "Error occurred while Running. Message : ${error.getMessage()}"
-                        FAILED_STAGE_NAME = "Health check Web"
+                        FAILED_STAGE_NAME = "Health check Web deploy with docker"
                         FAILED_STAGE_LOG = "${error.getMessage()}"
                         withCredentials([usernamePassword(credentialsId: 'nexus-credential', passwordVariable: 'PSW', usernameVariable: 'USER')]){
                             sshagent(['ssh-vm-docker']) {
@@ -155,6 +155,99 @@ pipeline {
                 }
             }
         }
+
+        stage('Push artifact to Nexus Repo') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    try {
+                        nexusArtifactUploader(
+                            nexusVersion: 'nexus3',
+                            protocol: 'http',
+                            nexusUrl: "${NEXUS_URL}",
+                            groupId: "${NEXUS_GROUP}",
+                            version: "${ARTIFACT_VERS}",
+                            repository: "${NEXUS_PRO_REPO}",
+                            credentialsId: "${NEXUS_CREDENTIAL_ID}",
+                            artifacts: [
+                                [artifactId: "${NEXUS_ARTIFACT_ID}",
+                                classifier: '',
+                                file: './target/spring-petclinic-3.1.0-SNAPSHOT.jar',
+                                type: 'jar']
+                            ]
+                        )
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
+                        FAILED_STAGE_NAME = "Push artifact to Nexus Repo"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
+                    }
+                }
+            }
+        }
+
+        stage('Pull artifact on VM') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    try {
+                        sshagent(['sshagent-acc']) {
+                            sh 'ssh -o StrictHostKeyChecking=no root@192.168.56.120 curl -v -u $NEXUS_ACC_USR:$NEXUS_ACC_PSW -o /tmp/web-Spring.jar http://$NEXUS_URL/repository/$NEXUS_PRO_REPO/$NEXUS_GROUP/$NEXUS_ARTIFACT_ID/$ARTIFACT_VERS/$NEXUS_ARTIFACT_ID-$ARTIFACT_VERS.jar'
+                        }
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
+                        FAILED_STAGE_NAME = "Pull artifact on VM"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
+                    }
+                }
+            }
+        }
+
+        stage('Deploy artifact on VM') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    try {
+                        sshagent(['sshagent-acc']) {
+                            sh 'ssh root@192.168.56.120 systemctl restart web-Spring'
+                        }
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
+                        FAILED_STAGE_NAME = "Deploy artifact on VM"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
+                    }
+                }
+            }
+        }
+
+        stage('Health check Web deploy with VM') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    try {
+                        sleep(10)
+                        def response = httpRequest url: 'http://192.168.56.120:8080'
+                        println("Status: "+response.status)
+                    } catch(error) {
+                        echo "Error occurred while Running. Message : ${error.getMessage()}"
+                        FAILED_STAGE_NAME = "Health check Web deploy with VM"
+                        FAILED_STAGE_LOG = "${error.getMessage()}"
+                        throw error
+                    }
+                }
+            }
+        }
+    }
     }
 
     post {
