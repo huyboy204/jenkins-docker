@@ -248,8 +248,6 @@ pipeline {
             }
         }
     }
-    }
-
     post {
         success {
             script {
