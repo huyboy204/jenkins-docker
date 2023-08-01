@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY target/spring-petclinic-3.1.0-SNAPSHOT.jar /app/spring-petclinic-3.1.0-SNAPSHOT.jar
 RUN chown nobody:nogroup /app/spring-petclinic-3.1.0-SNAPSHOT.jar
+RUN chown nobody:nogroup /app/logs/
 
 EXPOSE 8080
 
